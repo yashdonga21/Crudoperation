@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>Document</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        table,
+        td,
+        th {
+            border: 2px solid black;
+            border-collapse: collapse;
+        }
+
+        td,
+        th {
+            padding: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <center>
+        <h1 class="mt-5">FORM</h1>
+        <br>
+        <label for="name">Name</label>
+        <input type="text" id="name"><br><br>
+        <label for="phone">Phone</label>
+        <input type="text" id="phone"><br><br>
+        <label for="email">Email</label>
+        <input type="email" id="email"><br><br>
+        <label for="age">Age</label>
+        <input type="number" id="age"><br><br>
+        <label for="dob">Date Of Birth</label>
+        <input type="date" id="dob"><br><br>
+        <button id="btn" class="btn btn-dark btn-outline-success text-light border-light">Submit</button>
+    </center>
+    <br>
+    <br>
+    <center>
+        <table>
+            <thead>
+                <tr>
+                    <th>NAME</th>
+                    <th>PHONE</th>
+                    <th>EMAIL</th>
+                    <th>AGE</th>
+                    <th>DATE OF BIRTH</th>
+                    <th>ACTION</th>
+                </tr>
+            </thead>
+            <tbody id="tbl">
+            </tbody>
+        </table>
+    </center>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        crossorigin="anonymous"></script>
+
+    <script>
+        const submit = document.getElementById("btn")
+        let data = JSON.parse(localStorage.getItem("data") || "[]")
+
+        function ListData() {
+            const tbl = document.getElementById("tbl")
+            tbl.innerHTML = ""
+            data.forEach((user) => {
+                const tr = document.createElement("tr")
+                const name = document.createElement('td')
+                name.innerText = user.name;
+                const phone = document.createElement('td');
+                phone.innerText = user.phone;
+                const email = document.createElement("td")
+                email.innerText = user.email;
+                const age = document.createElement("td")
+                age.innerText = user.age;
+                const dob = document.createElement("td")
+                dob.innerText = user.dob;
+
+                const Action = document.createElement("td")
+                const Update = document.createElement("button")
+                const Delete = document.createElement("button")
+                Update.innerText = "Update"
+                Update.className = 'btn btn-primary btn-outline-success text-light border-light'
+                Update.id = "Update_" + user.phone
+                Delete.id = "Delete_" + user.phone
+                Delete.innerText = "Delete"
+                Delete.className = 'btn btn-dark btn-outline-danger text-light border-light'
+                Action.appendChild(Update)
+                Action.appendChild(Delete)
+                Update.addEventListener("click", (e) => {
+                    let phone = e.target.id.split("_")[1]
+                    let user = data.find((x) => x.phone === phone)
+                    const Name_input = document.getElementById("name")
+                    const Phone_input = document.getElementById("phone")
+                    const Email_input = document.getElementById("email")
+                    const Age_input = document.getElementById("age")
+                    const Dob_input = document.getElementById("dob")
+
+                    Name_input.value = user.name
+                    Phone_input.value = user.phone
+                    Email_input.value = user.email
+                    Age_input.value = user.age
+                    Dob_input.value = user.dob
+
+                    Phone_input.disabled = true
+                    submit.removeEventListener("click", CreateUser)
+                    submit.innerText = "Update"
+                    submit.addEventListener("click", UpdateUser)
+                })
+                Delete.addEventListener("click", (e) => {
+                    let phone = e.target.id.split("_")[1]
+                    data = data.filter((x) => x.phone !== phone)
+                    localStorage.setItem("data", JSON.stringify(data))
+                    ListData()
+                })
+                tr.appendChild(name)
+                tr.appendChild(phone)
+                tr.appendChild(email)
+                tr.appendChild(age)
+                tr.appendChild(dob)
+                tr.appendChild(Action)
+                tbl.appendChild(tr)
+            })
+        }
+
+        function CreateUser() {
+            const name = document.getElementById("name").value
+            const phone = document.getElementById("phone").value
+            const email = document.getElementById("email").value
+            const age = document.getElementById("age").value
+            const dob = document.getElementById("dob").value
+
+            const newUser = { name, phone, email, age, dob }
+            data.push(newUser)
+            localStorage.setItem("data", JSON.stringify(data))
+            ListData()
+        }
+
+        function UpdateUser() {
+            const name = document.getElementById("name").value
+            const phone = document.getElementById("phone").value
+            const email = document.getElementById("email").value
+            const age = document.getElementById("age").value
+            const dob = document.getElementById("dob").value
+
+            data = data.map((x) => (x.phone === phone ? { name, phone, email, age, dob } : x))
+            localStorage.setItem("data", JSON.stringify(data))
+            ListData()
+        }
+
+        submit.addEventListener("click", CreateUser)
+        ListData()
+    </script>
+
+</body>
+</html>
+
+
